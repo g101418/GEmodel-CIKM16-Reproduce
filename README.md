@@ -16,6 +16,8 @@
    - delta_time_weight设置用户向量生成权重
    - 在该代码中，应当先运行dicts_gen()函数以产生字典(不需要再运行get_dicts())，第二次运行程序时可以不调用dicts_gen()。user_vec_gen()受限于sample_num，每次并不一致，如果需要重新抽样，请重新运行该函数，否则可以使用get_user_vec()读取用户向量
 
+PS: 原数据集中，有一行的POI名与众不同，由6个(?)数字组成，可能会造成影响，请注意。
+
 ---
 
 仓库中cpp程序来自Dr. Hongzhi Yin主页(https://sites.google.com/site/dbhongzhi/ )，我只修改了部分bug。论文引用为：
