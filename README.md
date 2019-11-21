@@ -18,6 +18,6 @@
 
 ---
 
-仓库中cpp程序来自Dr. Hongzhi Yin主页(https://sites.google.com/site/dbhongzhi/)，我只修改了部分bug。论文引用为：
+仓库中cpp程序来自Dr. Hongzhi Yin主页(https://sites.google.com/site/dbhongzhi/ )，我只修改了部分bug。论文引用为：
 
 > Xie M, Yin H, Wang H, et al. Learning graph-based poi embedding for location-based recommendation[C]//Proceedings of the 25th ACM International on Conference on Information and Knowledge Management. ACM, 2016: 15-24.
