@@ -5,6 +5,7 @@ import numpy as np
 import time
 import calendar
 import math
+from progress.bar import Bar
 
 train_frac = 0.9
 delta_t = 25 * 24 *3600
@@ -73,6 +74,7 @@ def poi_poi_gen():
     print('poi_poi_gen')
     userIDs = train_data['userID'].drop_duplicates()
     poi_poi_dict = {}
+    bar = Bar('poi_poi_gen', max=len(userIDs))
     for uid in userIDs:
         databyid = train_data[train_data['userID']==uid][['VenueId','Time(GMT)']]
         data_list = []
@@ -88,6 +90,8 @@ def poi_poi_gen():
                             poi_poi_dict[poiID_][poiID] = 1
                         else:
                             poi_poi_dict[poiID_][poiID] += 1
+        bar.next()
+    bar.finish()
     str_out = ''
     for poiID, value in poi_poi_dict.items():
         for poiID_, weight in poi_poi_dict[poiID].items():

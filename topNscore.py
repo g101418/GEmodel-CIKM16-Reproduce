@@ -3,13 +3,16 @@ import os
 import sys
 import pandas as pd
 import numpy as np
+from numpy import array
 import time
 import calendar
 import math
+from progress.bar import Bar
 
 N = 10
 sample_num = 100
-delta_time_weight = 5 * 24 * 3600
+target_ratio = 0.1 # 第25天权重降至比例
+delta_time_weight = 25/(-math.log(target_ratio)) * 24 * 3600
 
 test_data = pd.read_csv('./test_data.txt',header=None,sep='\t').sample(n=sample_num, random_state=0, axis=0)
 train_data = pd.read_csv('./train_data.txt',header=None,sep='\t')
@@ -62,11 +65,17 @@ def write_in_file(f_out_path,str_out):
     f_out.close()
 
 def get_dicts():
+    print('get_dicts')
+    global poi_vec_dict
+    global time_vec_dict
+    global region_vec_dict
     poi_vec_dict = eval(open('./poi_vec_dict.txt','r').read())
     time_vec_dict = eval(open('./time_vec_dict.txt','r').read())
     region_vec_dict = eval(open('./region_vec_dict.txt','r').read())
 
 def get_user_vec():
+    print('get_user_vec')
+    global user_vec
     user_vec = pd.read_csv('./user_vec.txt',header=0,sep='\t')
 
 def dicts_gen():
@@ -94,7 +103,7 @@ def dicts_gen():
     write_in_file('./region_vec_dict.txt',str(region_vec_dict))
 
 def user_vec_gen():
-    print('user_vec_gen')
+    # print('user_vec_gen')
     user_vec['userID'] = test_data[1]
     user_vec['VenueId'] = test_data[3]
     user_vec['Time_Slot'] = test_data[2].apply(get_time_slot)
@@ -102,14 +111,18 @@ def user_vec_gen():
     user_vec['Region'] = test_data[5].apply(get_region)
     
     train_data['Time'] = train_data[2].apply(get_timestamp)
-    # print(poi_vec_data)
+
+    bar = Bar('user_vec_gen', max=sample_num)
     for index, row in user_vec.iterrows():
         vec = np.zeros(100)
         pois_time = train_data[(train_data['Time']<row['Time'])&(train_data[1]==row['userID'])][[3,'Time']]
+        # 方法1：除以delta_time_weight
         for index_, row_ in pois_time.iterrows():
             p_v = np.array(poi_vec_data[poi_vec_data[0]==row_[3]][poi_vec_data.columns[1:]].iloc[0])
             vec = vec + math.exp(-(row['Time']-row_['Time'])/delta_time_weight) * p_v
         user_vec.loc[index,[x for x in range(100)]] = vec
+        bar.next()
+    bar.finish()
     user_vec.to_csv('./user_vec.txt',sep='\t',header=True,index=0)
 
 
@@ -143,9 +156,9 @@ def topNscore():
         topN_pois = [x[0] for x in topN]
         if poiID in topN_pois:
             hit_num += 1
-        print('第',sample_num,'个样本',hit_num,sample_num, hit_num/sample_num)
-        
-        
+        print('第',sample_num,'个样本',hit_num,sample_num, '{:.3}'.format(hit_num/sample_num))
+
+
 if __name__ == '__main__':
     # dicts_gen()
     get_dicts()
